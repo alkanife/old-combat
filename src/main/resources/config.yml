@@ -1,0 +1,6 @@
+attack-speed: true
+critical-hits: true
+knockback: true
+regen: true
+sound: true
+sweep: true

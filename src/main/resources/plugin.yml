@@ -1,0 +1,7 @@
+main: fr.alkanife.oldcombat.OldCombat
+name: Old-combat
+version: 1.0
+author: Alkanife
+api-version: 1.18
+website: https://github.com/alkanife/old-combat
+depend: [CommandAPI, ProtocolLib]
