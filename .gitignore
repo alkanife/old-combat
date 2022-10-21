@@ -1,0 +1,6 @@
+.DS_Store
+.idea/
+dev_server/
+*.iml
+target/
+*.jar
