@@ -1,9 +1,9 @@
 # old-combat
-> Minecraft Plugin (1.19.2)
+> Minecraft Plugin (1.19.3)
 
 A very light version of [BukkitOldCombatMechanics](https://github.com/kernitus/BukkitOldCombatMechanics).
 
-This plugin was made to be used with other plugins, but you can still enable/disable modules with the `/old-combat` command (requires to be a server operator).
+This plugin was made to be used with other plugins, but you can still enable/disable modules with the `/oldcombat` command (requires to be a server operator).
 
 ## Requirements
 This plugins requires the latest versions of [ProtocolLib](https://github.com/dmulloy2/ProtocolLib) and [CommandAPI](https://github.com/JorelAli/CommandAPI).
