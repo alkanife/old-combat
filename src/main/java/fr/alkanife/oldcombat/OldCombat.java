@@ -18,7 +18,7 @@ public class OldCombat extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new EntityDamageByEntityListener(this), this);
 
-        Bukkit.getPluginManager().registerEvents(new KnockbackModule(), this);
+        Bukkit.getPluginManager().registerEvents(new KnockbackModule(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerRegenModule(this), this);
 
         new SoundModule(this);

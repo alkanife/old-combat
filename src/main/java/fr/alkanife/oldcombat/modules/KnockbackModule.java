@@ -1,7 +1,11 @@
 package fr.alkanife.oldcombat.modules;
 
+import fr.alkanife.oldcombat.OldCombat;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -22,15 +26,21 @@ import java.util.UUID;
 
 public class KnockbackModule implements Listener {
 
+    private OldCombat oldCombat;
     public static boolean ENABLED = false;
 
-    private double knockbackHorizontal = 0.4;
-    private double knockbackVertical = 0.4;
-    private double knockbackVerticalLimit = 0.4;
-    private double knockbackExtraHorizontal = 0.5;
-    private double knockbackExtraVertical = 0.1;
+    public static double knockbackHorizontal = 0.4;
+    public static double knockbackVertical = 0.4;
+    public static double knockbackVerticalLimit = 0.4;
+    public static double knockbackExtraHorizontal = 0.5;
+    public static double knockbackExtraVertical = 0.1;
+    public static boolean netheriteKnockbackResistance = false;
 
     private final HashMap<UUID, Vector> playerKnockbackHashMap = new HashMap<>();
+
+    public KnockbackModule(OldCombat oldCombat) {
+        this.oldCombat = oldCombat;
+    }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
@@ -47,6 +57,15 @@ public class KnockbackModule implements Listener {
         if (!playerKnockbackHashMap.containsKey(uuid)) return;
         event.setVelocity(playerKnockbackHashMap.get(uuid));
         playerKnockbackHashMap.remove(uuid);
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        // Disable netherite kb, the knockback resistance attribute makes the velocity event not be called
+        final Entity entity = event.getEntity();
+        if (!(entity instanceof Player) || netheriteKnockbackResistance) return;
+        final AttributeInstance attribute = ((Player) entity).getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+        attribute.getModifiers().forEach(attribute::removeModifier);
     }
 
     // Monitor priority because we don't modify anything here, but apply on velocity change event
@@ -106,8 +125,19 @@ public class KnockbackModule implements Listener {
             }
         }
 
+        if (netheriteKnockbackResistance) {
+            // Allow netherite to affect the horizontal knockback. Each piece of armour yields 10% resistance
+            final double resistance = 1 - victim.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).getValue();
+            playerVelocity.multiply(new Vector(resistance, 1, resistance));
+        }
+
+        final UUID victimId = victim.getUniqueId();
+
         // Knockback is sent immediately in 1.8+, there is no reason to send packets manually
-        playerKnockbackHashMap.put(victim.getUniqueId(), playerVelocity);
+        playerKnockbackHashMap.put(victimId, playerVelocity);
+
+        // Sometimes PlayerVelocityEvent doesn't fire, remove data to not affect later events if that happens
+        Bukkit.getScheduler().runTaskLater(oldCombat, () -> playerKnockbackHashMap.remove(victimId), 1);
     }
 
 }
